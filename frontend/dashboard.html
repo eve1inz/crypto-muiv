@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет | CryptoTrade</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <!-- Font Awesome for icons -->
+     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="dashboard-page">
+    <!-- Notification System -->
+    <div id="notification-container"></div>
+    
+    <!-- Header -->
+    <header class="dashboard-header">
+        <div class="container">
+            <div class="logo">
+                <a href="/">CryptoTrade</a>
+            </div>
+            <div class="user-menu">
+                <div class="notification-bell">
+                    <button id="notification-toggle">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notification-count">0</span>
+                    </button>
+                    <div class="notification-dropdown" id="notification-dropdown">
+                        <div class="notification-header">
+                            <h3>Уведомления</h3>
+                            <button id="mark-all-read">Прочитать все</button>
+                        </div>
+                        <div class="notification-list" id="notification-list">
+                            <div class="loading-spinner">Загрузка уведомлений...</div>
+                        </div>
+                    </div>
+                </div>
+                <span id="user-greeting">Здравствуйте, <span id="username">Пользователь</span></span>
+                <div class="dropdown">
+                    <button class="dropdown-toggle">
+                        <i class="fas fa-user-circle"></i>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="#profile">Профиль</a>
+                        <a href="#settings">Настройки</a>
+                        <a href="#" id="logout-btn">Выход</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="dashboard-content">
+        <div class="container">
+            <!-- Sidebar -->
+            <aside class="dashboard-sidebar">
+                <nav class="dashboard-nav">
+                    <ul>
+                        <li><a href="#overview" class="active" data-section="overview-section">
+                            <i class="fas fa-home"></i> Обзор
+                        </a></li>
+                        <li><a href="#wallets" data-section="wallets-section">
+                            <i class="fas fa-wallet"></i> Кошельки
+                        </a></li>
+                        <li><a href="#trading" data-section="trading-section">
+                            <i class="fas fa-chart-line"></i> Торговля
+                        </a></li>
+                        <li><a href="#orders" data-section="orders-section">
+                            <i class="fas fa-list-alt"></i> Ордеры
+                        </a></li>
+                        <li><a href="#history" data-section="history-section">
+                            <i class="fas fa-history"></i> История
+                        </a></li>
+                        <li><a href="#settings" data-section="settings-section">
+                            <i class="fas fa-cog"></i> Настройки
+                        </a></li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <!-- Content Sections -->
+            <div class="dashboard-main">
+                <!-- Overview Section -->
+                <section id="overview-section" class="dashboard-section active">
+                    <h2 class="section-title">Обзор аккаунта</h2>
+                    
+                    <div class="dashboard-widgets">
+                        <div class="widget total-balance">
+                            <h3>Общий баланс</h3>
+                            <div class="balance-amount">$<span id="total-balance">0.00</span></div>
+                            <div class="balance-change">
+                                <span id="balance-change-percent">0.00%</span> за последние 24ч
+                            </div>
+                        </div>
+                        
+                        <div class="widget wallet-summary">
+                            <h3>Быстрый обзор кошельков</h3>
+                            <div id="wallet-summary-list">
+                                <div class="loading-spinner">Загрузка...</div>
+                            </div>
+                            <a href="#wallets" class="btn btn-secondary wallet-link">Все кошельки</a>
+                        </div>
+                        
+                        <div class="widget recent-activity">
+                            <h3>Недавняя активность</h3>
+                            <div id="recent-activity-list">
+                                <div class="loading-spinner">Загрузка...</div>
+                            </div>
+                            <a href="#history" class="btn btn-secondary history-link">Вся история</a>
+                        </div>
+                    </div>
+                    
+                    <div class="market-overview">
+                        <h3>Обзор рынка</h3>
+                        <div class="market-table-container">
+                            <table class="market-table">
+                                <thead>
+                                    <tr>
+                                        <th>Валютная пара</th>
+                                        <th>Последняя цена</th>
+                                        <th>Изменение (24ч)</th>
+                                        <th>Объем (24ч)</th>
+                                        <th>Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="market-overview-data">
+                                    <tr>
+                                        <td colspan="5">Загрузка данных рынка...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Wallets Section -->
+                <section id="wallets-section" class="dashboard-section">
+                    <h2 class="section-title">Мои кошельки</h2>
+                    
+                    <div class="section-actions">
+                        <button id="create-wallet-btn" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Создать новый кошелек
+                        </button>
+                    </div>
+                    
+                    <div id="wallets-container" class="wallets-grid">
+                        <div class="loading-spinner">Загрузка кошельков...</div>
+                    </div>
+
+                    <!-- Modal for creating new wallet -->
+                    <div id="create-wallet-modal" class="modal">
+                        <div class="modal-content">
+                            <span class="close-modal">&times;</span>
+                            <h3>Создать новый кошелек</h3>
+                            <form id="create-wallet-form">
+                                <div class="form-group">
+                                    <label for="wallet-currency">Выберите валюту:</label>
+                                    <select id="wallet-currency" required>
+                                        <option value="">Выберите криптовалюту</option>
+                                        <option value="BTC">Bitcoin (BTC)</option>
+                                        <option value="ETH">Ethereum (ETH)</option>
+                                        <option value="USDT">Tether (USDT)</option>
+                                        <option value="BNB">Binance Coin (BNB)</option>
+                                        <option value="SOL">Solana (SOL)</option>
+                                        <option value="ADA">Cardano (ADA)</option>
+                                        <option value="XRP">XRP</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Создать кошелек</button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- Modal for deposit/withdraw -->
+                    <div id="wallet-action-modal" class="modal">
+                        <div class="modal-content">
+                            <span class="close-modal">&times;</span>
+                            <h3 id="wallet-action-title">Действие с кошельком</h3>
+                            <form id="wallet-action-form">
+                                <input type="hidden" id="action-wallet-id">
+                                <input type="hidden" id="action-type">
+                                
+                                <div class="form-group">
+                                    <label for="action-amount">Сумма:</label>
+                                    <div class="input-with-currency">
+                                        <input type="number" id="action-amount" step="0.0001" min="0" required>
+                                        <span id="action-currency">BTC</span>
+                                    </div>
+                                </div>
+                                
+                                <div id="withdraw-address-group" class="form-group" style="display: none;">
+                                    <label for="withdraw-address">Адрес кошелька:</label>
+                                    <input type="text" id="withdraw-address" placeholder="Введите адрес получателя">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label id="action-fee-label">Комиссия: <span id="action-fee">0.00</span> <span id="action-fee-currency">BTC</span></label>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Итого: <span id="action-total">0.00</span> <span id="action-total-currency">BTC</span></label>
+                                </div>
+                                
+                                <button type="submit" id="wallet-action-submit" class="btn btn-primary">Подтвердить</button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Trading Section -->
+                <section id="trading-section" class="dashboard-section">
+                    <h2 class="section-title">Торговля</h2>
+                    
+                    <div class="market-selector">
+                        <label for="market-pair">Выберите пару:</label>
+                        <select id="market-pair">
+                            <option value="BTC-USDT">BTC/USDT</option>
+                            <option value="ETH-USDT">ETH/USDT</option>
+                            <option value="BNB-USDT">BNB/USDT</option>
+                            <option value="SOL-USDT">SOL/USDT</option>
+                            <option value="ADA-USDT">ADA/USDT</option>
+                        </select>
+                    </div>
+                    
+                    <div class="trading-layout">
+                        <div class="chart-container" style="max-width: 700px; margin:0 auto;">
+                        <h3>График <span id="chart-pair">BTC/USDT</span></h3>
+                        <div id="price-chart" style="position:relative; min-height:300px; background:#fff; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.04);">
+                            <!-- canvas добавит JS -->
+                        </div>
+                    </div>
+
+
+
+                        
+                        <div class="order-form-container">
+                            <div class="tabs">
+                                <button class="tab-btn active" data-tab="buy">Купить</button>
+                                <button class="tab-btn" data-tab="sell">Продать</button>
+                            </div>
+                            
+                            <div id="buy" class="tab-content active">
+                                <form id="buy-form">
+                                    <div class="form-group">
+                                        <label for="buy-amount">Количество:</label>
+                                        <div class="input-with-currency">
+                                            <input type="number" id="buy-amount" step="0.0001" min="0" placeholder="0.00">
+                                            <span id="buy-currency">BTC</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="buy-price">Цена:</label>
+                                        <div class="input-with-currency">
+                                            <input type="number" id="buy-price" step="0.01" min="0" placeholder="0.00">
+                                            <span id="buy-price-currency">USDT</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="buy-total">Итого:</label>
+                                        <div class="input-with-currency">
+                                            <input type="text" id="buy-total" readonly placeholder="0.00">
+                                            <span id="buy-total-currency">USDT</span>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-success btn-block">Купить <span id="buy-btn-currency">BTC</span></button>
+                                </form>
+                            </div>
+                            
+                            <div id="sell" class="tab-content">
+                                <form id="sell-form">
+                                    <div class="form-group">
+                                        <label for="sell-amount">Количество:</label>
+                                        <div class="input-with-currency">
+                                            <input type="number" id="sell-amount" step="0.0001" min="0" placeholder="0.00">
+                                            <span id="sell-currency">BTC</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="sell-price">Цена:</label>
+                                        <div class="input-with-currency">
+                                            <input type="number" id="sell-price" step="0.01" min="0" placeholder="0.00">
+                                            <span id="sell-price-currency">USDT</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="sell-total">Итого:</label>
+                                        <div class="input-with-currency">
+                                            <input type="text" id="sell-total" readonly placeholder="0.00">
+                                            <span id="sell-total-currency">USDT</span>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-danger btn-block">Продать <span id="sell-btn-currency">BTC</span></button>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <div class="orderbook-container">
+                            <h3>Книга ордеров</h3>
+                            <div class="orderbook">
+                                <div class="orderbook-header">
+                                    <div>Цена (USDT)</div>
+                                    <div>Количество</div>
+                                    <div>Итого</div>
+                                </div>
+                                <div class="sell-orders"></div>
+                                <div class="current-price">$0.00</div>
+                                <div class="buy-orders"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Orders Section -->
+                <section id="orders-section" class="dashboard-section">
+                    <h2 class="section-title">Мои ордеры</h2>
+                    
+                    <div class="orders-tabs">
+                        <button class="order-tab-btn active" data-tab="active-orders">Активные</button>
+                        <button class="order-tab-btn" data-tab="completed-orders">Выполненные</button>
+                        <button class="order-tab-btn" data-tab="cancelled-orders">Отмененные</button>
+                    </div>
+                    
+                    <div id="active-orders" class="orders-tab-content active">
+                        <div class="orders-table-container">
+                            <table class="orders-table">
+                                <thead>
+                                    <tr>
+                                        <th>Дата</th>
+                                        <th>Пара</th>
+                                        <th>Тип</th>
+                                        <th>Цена</th>
+                                        <th>Количество</th>
+                                        <th>Итого</th>
+                                        <th>Статус</th>
+                                        <th>Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="active-orders-data">
+                                    <tr>
+                                        <td colspan="8">Загрузка активных ордеров...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div id="completed-orders" class="orders-tab-content">
+                        <div class="orders-table-container">
+                            <table class="orders-table">
+                                <thead>
+                                    <tr>
+                                        <th>Дата</th>
+                                        <th>Пара</th>
+                                        <th>Тип</th>
+                                        <th>Цена</th>
+                                        <th>Количество</th>
+                                        <th>Итого</th>
+                                        <th>Статус</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="completed-orders-data">
+                                    <tr>
+                                        <td colspan="7">Загрузка выполненных ордеров...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div id="cancelled-orders" class="orders-tab-content">
+                        <div class="orders-table-container">
+                            <table class="orders-table">
+                                <thead>
+                                    <tr>
+                                        <th>Дата</th>
+                                        <th>Пара</th>
+                                        <th>Тип</th>
+                                        <th>Цена</th>
+                                        <th>Количество</th>
+                                        <th>Итого</th>
+                                        <th>Статус</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cancelled-orders-data">
+                                    <tr>
+                                        <td colspan="7">Загрузка отмененных ордеров...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- History Section -->
+                <section id="history-section" class="dashboard-section">
+                    <h2 class="section-title">История операций</h2>
+                    
+                    <div class="history-filters">
+                        <div class="form-group">
+                            <label for="history-type">Тип:</label>
+                            <select id="history-type">
+                                <option value="all">Все операции</option>
+                                <option value="deposit">Пополнения</option>
+                                <option value="withdrawal">Выводы</option>
+                                <option value="trade">Сделки</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="history-wallet">Кошелек:</label>
+                            <select id="history-wallet">
+                                <option value="all">Все кошельки</option>
+                                <!-- Будет заполнено динамически -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="history-date-from">С:</label>
+                            <input type="date" id="history-date-from">
+                        </div>
+                        <div class="form-group">
+                            <label for="history-date-to">По:</label>
+                            <input type="date" id="history-date-to">
+                        </div>
+                        <button id="history-filter-btn" class="btn btn-secondary">Применить</button>
+                    </div>
+                    
+                    <div class="history-table-container">
+                        <table class="history-table">
+                            <thead>
+                                <tr>
+                                    <th>Дата</th>
+                                    <th>Тип</th>
+                                    <th>Валюта</th>
+                                    <th>Сумма</th>
+                                    <th>Комиссия</th>
+                                    <th>Статус</th>
+                                    <th>Детали</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-data">
+                                <tr>
+                                    <td colspan="7">Загрузка истории операций...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                <!-- Modal for transaction details -->
+                <div id="transaction-detail-modal" class="modal">
+                    <div class="modal-content">
+                        <span id="transaction-detail-close" class="close-modal">&times;</span>
+                        <h3>Детали транзакции</h3>
+                        <div id="transaction-detail-content"></div>
+                    </div>
+                </div>
+
+                <!-- Settings Section -->
+                <section id="settings-section" class="dashboard-section">
+                    <h2 class="section-title">Настройки аккаунта</h2>
+                    
+                    <div class="settings-container">
+                        <div class="settings-section">
+                            <h3>Личные данные</h3>
+                            <form id="profile-form">
+                                <div class="form-group">
+                                    <label for="profile-username">Имя пользователя:</label>
+                                    <input type="text" id="profile-username" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label for="profile-email">Email:</label>
+                                    <input type="email" id="profile-email" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label for="profile-name">Полное имя:</label>
+                                    <input type="text" id="profile-name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="profile-phone">Телефон:</label>
+                                    <input type="tel" id="profile-phone">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                            </form>
+                        </div>
+                        
+                        <div class="settings-section">
+                            <h3>Безопасность</h3>
+                            <form id="security-form">
+                                <div class="form-group">
+                                    <label for="current-password">Текущий пароль:</label>
+                                    <input type="password" id="current-password">
+                                </div>
+                                <div class="form-group">
+                                    <label for="new-password">Новый пароль:</label>
+                                    <input type="password" id="new-password">
+                                </div>
+                                <div class="form-group">
+                                    <label for="confirm-password">Подтвердите пароль:</label>
+                                    <input type="password" id="confirm-password">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Изменить пароль</button>
+                            </form>
+                            
+                            <div class="security-options">
+                                <h4>Двухфакторная аутентификация</h4>
+                                <div class="toggle-container">
+                                    <label class="toggle">
+                                        <input type="checkbox" id="enable-2fa">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                    <span>Включить 2FA</span>
+                                </div>
+                                <div id="twofa-setup" style="display: none;">
+                                    <p>Отсканируйте QR-код своим приложением аутентификации:</p>
+                                    <div id="qrcode-container"></div>
+                                    <div class="form-group">
+                                        <label for="twofa-code">Введите код подтверждения:</label>
+                                        <input type="text" id="twofa-code">
+                                    </div>
+                                    <button id="verify-2fa" class="btn btn-primary">Подтвердить</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-section">
+                            <h3>Уведомления</h3>
+                            <div class="notification-options">
+                                <div class="toggle-container">
+                                    <label class="toggle">
+                                        <input type="checkbox" id="email-notifications">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                    <span>Email уведомления</span>
+                                </div>
+                                <div class="toggle-container">
+                                    <label class="toggle">
+                                        <input type="checkbox" id="trade-notifications">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                    <span>Уведомления о сделках</span>
+                                </div>
+                                <div class="toggle-container">
+                                    <label class="toggle">
+                                        <input type="checkbox" id="price-alerts">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                    <span>Оповещения о цене</span>
+                                </div>
+                                <button id="save-notifications" class="btn btn-primary">Сохранить настройки</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+</div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="dashboard-footer">
+        <div class="container">
+            <p>&copy; 2025 CryptoTrade. Все права защищены.</p>
+            <nav class="footer-nav">
+                <a href="#">Условия использования</a>
+                <a href="#">Политика конфиденциальности</a>
+                <a href="#">Поддержка</a>
+            </nav>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="js/app.js"></script>
+    <script src="js/dashboard.js"></script>
+    <!-- Модальное окно для деталей транзакции -->
+<div id="transaction-detail-modal" style="display:none; position:fixed; left:0;top:0;width:100vw;height:100vh;z-index:9999;background:rgba(0,0,0,0.35); align-items:center; justify-content:center;">
+  <div style="background:#fff; max-width:400px; width:90%; margin:100px auto; padding:24px 20px 20px 20px; position:relative; border-radius:10px; box-shadow:0 2px 16px rgba(0,0,0,0.15);">
+    <button id="transaction-detail-close" style="position:absolute;top:12px;right:16px;font-size:24px;background:none;border:none;cursor:pointer;">&times;</button>
+    <div id="transaction-detail-content"></div>
+  </div>
+</div>
+
+</body>
+</html>

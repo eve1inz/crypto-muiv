@@ -1,0 +1,293 @@
+{
+    "swagger": "2.0",
+    "info": {
+      "title": "Crypto Exchange API",
+      "description": "RESTful API для криптовалютной биржи",
+      "version": "1.0.0"
+    },
+    "basePath": "/api/v1/",
+    "schemes": [
+      "http",
+      "https"
+    ],
+    "consumes": [
+      "application/json"
+    ],
+    "produces": [
+      "application/json"
+    ],
+    "securityDefinitions": {
+      "Bearer": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header",
+        "description": "JWT Authorization header. Example: 'Bearer {token}'"
+      }
+    },
+    "paths": {
+      "/auth/register": {
+        "post": {
+          "tags": [
+            "Authentication"
+          ],
+          "summary": "Регистрация нового пользователя",
+          "description": "Создает нового пользователя в системе",
+          "parameters": [
+            {
+              "name": "body",
+              "in": "body",
+              "required": true,
+              "schema": {
+                "type": "object",
+                "required": [
+                  "username",
+                  "email",
+                  "password"
+                ],
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "user123"
+                  },
+                  "email": {
+                    "type": "string",
+                    "example": "user@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "securepassword"
+                  }
+                }
+              }
+            }
+          ],
+          "responses": {
+            "201": {
+              "description": "Пользователь успешно создан",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "example": "User created successfully"
+                  },
+                  "user_id": {
+                    "type": "integer",
+                    "example": 1
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Ошибка в запросе"
+            }
+          }
+        }
+      },
+      "/auth/login": {
+        "post": {
+          "tags": [
+            "Authentication"
+          ],
+          "summary": "Вход в систему",
+          "description": "Аутентификация пользователя и получение JWT-токена",
+          "parameters": [
+            {
+              "name": "body",
+              "in": "body",
+              "required": true,
+              "schema": {
+                "type": "object",
+                "required": [
+                  "username",
+                  "password"
+                ],
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "user123"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "securepassword"
+                  }
+                }
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Успешная аутентификация",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "access_token": {
+                    "type": "string"
+                  },
+                  "refresh_token": {
+                    "type": "string"
+                  },
+                  "user": {
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Неверные учетные данные"
+            }
+          }
+        }
+      },
+      "/wallets": {
+        "get": {
+          "tags": [
+            "Wallets"
+          ],
+          "summary": "Получение списка кошельков пользователя",
+          "description": "Возвращает все кошельки текущего пользователя",
+          "security": [
+            {
+              "Bearer": []
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Список кошельков",
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "currency": {
+                      "type": "string",
+                      "example": "BTC"
+                    },
+                    "balance": {
+                      "type": "number",
+                      "example": 0.5
+                    },
+                    "address": {
+                      "type": "string",
+                      "example": "bc1q..."
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Не авторизован"
+            }
+          }
+        },
+        "post": {
+          "tags": [
+            "Wallets"
+          ],
+          "summary": "Создание нового кошелька",
+          "description": "Создает новый кошелек для указанной валюты",
+          "security": [
+            {
+              "Bearer": []
+            }
+          ],
+          "parameters": [
+            {
+              "name": "body",
+              "in": "body",
+              "required": true,
+              "schema": {
+                "type": "object",
+                "required": [
+                  "currency"
+                ],
+                "properties": {
+                  "currency": {
+                    "type": "string",
+                    "example": "ETH"
+                  }
+                }
+              }
+            }
+          ],
+          "responses": {
+            "201": {
+              "description": "Кошелек создан",
+              "schema": {
+                "type": "object"
+              }
+            },
+            "400": {
+              "description": "Ошибка в запросе"
+            },
+            "401": {
+              "description": "Не авторизован"
+            }
+          }
+        }
+      },
+      "/auth/google/login": {
+        "get": {
+          "tags": [
+            "Authentication"
+          ],
+          "summary": "Инициация входа через Google",
+          "description": "Начинает процесс OAuth аутентификации через Google",
+          "responses": {
+            "200": {
+              "description": "URL для аутентификации Google",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "auth_url": {
+                    "type": "string",
+                    "example": "https://accounts.google.com/o/oauth2/v2/auth?..."
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/auth/google/callback": {
+        "get": {
+          "tags": [
+            "Authentication"
+          ],
+          "summary": "Callback для Google OAuth",
+          "description": "Обрабатывает ответ от Google после успешной аутентификации",
+          "parameters": [
+            {
+              "name": "code",
+              "in": "query",
+              "type": "string",
+              "description": "Код авторизации от Google"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Успешная аутентификация",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "access_token": {
+                    "type": "string"
+                  },
+                  "refresh_token": {
+                    "type": "string"
+                  },
+                  "user": {
+                    "$ref": "#/definitions/User"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
