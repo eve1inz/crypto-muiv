@@ -242,14 +242,14 @@ locust -f locustfile.py --host=http://localhost:5000
 
 ## Авторы и лицензия
 
-- Автор: [Ваше Имя]
-- Лицензия: MIT (или иная по вашему выбору)
+- Автор: Андрей Лось
+- Лицензия: MIT 
 
 ---
 
 ## Контакты и поддержка
 
-- Telegram: @yourusername
-- Email: your@email.com
+- Telegram: @eve1inz
+- Email: andrewlos@yandex.ru
 - Issues: через GitHub или напрямую
 "# crypto-exchange-muiv" 
